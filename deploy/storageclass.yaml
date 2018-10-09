@@ -1,0 +1,6 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: goofys
+provisioner: storage.skpr.io/goofys
+reclaimPolicy: Delete
