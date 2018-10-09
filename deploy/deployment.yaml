@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: goofys-provisioner
+  namespace: kube-system
+  labels:
+    app: goofys-provisioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: goofys-provisioner
+  template:
+    metadata:
+      labels:
+        app: goofys-provisioner
+    spec:
+      containers:
+      - name: provisioner
+        image: previousnext/k8s-aws-goofys:latest
+        env:
+        - name: AWS_REGION
+          value: ap-southeast-2
+        - name: AWS_ACCESS_KEY_ID
+          value: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        - name: AWS_SECRET_ACCESS_KEY
+          value: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

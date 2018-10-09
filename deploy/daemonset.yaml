@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: goofys-install
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      name: install
+      labels:
+        app: install
+    spec:
+      containers:
+        - name: copy
+          image: previousnext/k8s-aws-goofys:latest
+          command: ["/deploy.sh"]
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /target
+              name: target
+      volumes:
+        - name: target
+          hostPath:
+            path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/skpr~goofys
