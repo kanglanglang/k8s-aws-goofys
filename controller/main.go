@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 	"time"
 
 	"github.com/golang/glog"
@@ -13,7 +14,13 @@ import (
 	"github.com/previousnext/k8s-aws-goofys/controller/provisioner"
 )
 
-const apiVersion = "storage.skpr.io/goofys"
+const (
+	apiVersion = "storage.skpr.io/goofys"
+	// EnvRegion for operators to declare which region to provision buckets.
+	EnvRegion = "AWS_REGION"
+	// EnvFormat for provisioning buckets.
+	EnvFormat = "GOOFYS_BUCKET_FORMAT"
+)
 
 func main() {
 	flag.Parse()
@@ -37,7 +44,7 @@ func main() {
 	}
 
 	// Create the provisioner: it implements the Provisioner interface expected by the controller.
-	provisioner, err := provisioner.New()
+	provisioner, err := provisioner.New(os.Getenv(EnvRegion), os.Getenv(EnvFormat))
 	if err != nil {
 		panic(err)
 	}

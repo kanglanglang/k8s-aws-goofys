@@ -3,7 +3,6 @@ package provisioner
 import (
 	"bytes"
 	"net/http"
-	"os"
 	"text/template"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -24,10 +23,6 @@ const (
 	DriverType = "fuse"
 	// OptionBucket passed to the Flexvolume for mounting.
 	OptionBucket = "Bucket"
-	// EnvRegion for operators to declare which region to provision buckets.
-	EnvRegion = "AWS_REGION"
-	// EnvFormat for provisioning buckets.
-	EnvFormat = "GOOFYS_BUCKET_FORMAT"
 	// DefaultEnvFormat is a fallback for when a format is not provided.
 	DefaultEnvFormat = "goofys-{{ .PVC.ObjectMeta.Namespace }}-{{ .PVC.ObjectMeta.Name }}"
 	// DefaultEnvRegion is a fallback for when a region is not provided.
@@ -42,13 +37,11 @@ type goofys struct {
 }
 
 // New return a Goofys provisioner.
-func New() (controller.Provisioner, error) {
-	region := os.Getenv(EnvRegion)
+func New(region, format string) (controller.Provisioner, error) {
 	if region == "" {
 		region = DefaultEnvRegion
 	}
 
-	format := os.Getenv(EnvFormat)
 	if format == "" {
 		format = DefaultEnvFormat
 	}
