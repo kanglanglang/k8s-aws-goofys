@@ -11,21 +11,28 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/golang/glog"
 	"github.com/kubernetes-incubator/external-storage/lib/controller"
+	"github.com/previousnext/k8s-aws-goofys/flexvolume/cmd"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
-	// DriverName for installing a Flexvolume.
+	// AnnotationUID for overriding the default UID (www-data)
+	AnnotationUID = "pv.storage.skpr.io/uid"
+	// DefaultAnnotationUID defaults the www-data uid
+	DefaultAnnotationUID = "33"
+	// AnnotationGID for overriding the default UID (www-data)
+	AnnotationGID = "pv.storage.skpr.io/gid"
+	// DefaultAnnotationGID defaults the www-data gid
+	DefaultAnnotationGID = "33"
+	// DriverName for installing a Flexvolume
 	DriverName = "skpr/goofys"
-	// DriverType for providing developers with more context around this storage option.
+	// DriverType for providing developers with more context around this storage option
 	DriverType = "fuse"
-	// OptionBucket passed to the Flexvolume for mounting.
-	OptionBucket = "Bucket"
-	// DefaultEnvFormat is a fallback for when a format is not provided.
+	// DefaultEnvFormat is a fallback for when a format is not provided
 	DefaultEnvFormat = "goofys-{{ .PVC.ObjectMeta.Namespace }}-{{ .PVC.ObjectMeta.Name }}"
-	// DefaultEnvRegion is a fallback for when a region is not provided.
+	// DefaultEnvRegion is a fallback for when a region is not provided
 	DefaultEnvRegion = "ap-southeast-2"
 )
 
@@ -78,6 +85,19 @@ func (p *goofys) Provision(options controller.VolumeOptions) (*v1.PersistentVolu
 		}
 	}
 
+	var (
+		uid = DefaultAnnotationUID
+		gid = DefaultAnnotationGID
+	)
+
+	if val, ok := options.PVC.ObjectMeta.Annotations[AnnotationUID]; ok {
+		uid = val
+	}
+
+	if val, ok := options.PVC.ObjectMeta.Annotations[AnnotationGID]; ok {
+		gid = val
+	}
+
 	glog.Infof("Responding with persistent volume spec: %s", name)
 
 	pv := &v1.PersistentVolume{
@@ -95,7 +115,9 @@ func (p *goofys) Provision(options controller.VolumeOptions) (*v1.PersistentVolu
 					Driver: DriverName,
 					FSType: DriverType,
 					Options: map[string]string{
-						OptionBucket: name,
+						cmd.OptionBucket: name,
+						cmd.OptionUID:    uid,
+						cmd.OptionGID:    gid,
 					},
 				},
 			},

@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/previousnext/k8s-aws-goofys/controller/provisioner"
-
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -28,10 +26,24 @@ func (cmd *cmdMount) run(c *kingpin.ParseContext) error {
 		})
 	}
 
-	if _, ok := options[provisioner.OptionBucket]; !ok {
+	if _, ok := options[OptionBucket]; !ok {
 		return respond(Response{
 			Status:  StatusFailure,
-			Message: fmt.Sprintf("Not found: %s", provisioner.OptionBucket),
+			Message: fmt.Sprintf("Not found: %s", OptionBucket),
+		})
+	}
+
+	if _, ok := options[OptionUID]; !ok {
+		return respond(Response{
+			Status:  StatusFailure,
+			Message: fmt.Sprintf("Not found: %s", OptionUID),
+		})
+	}
+
+	if _, ok := options[OptionGID]; !ok {
+		return respond(Response{
+			Status:  StatusFailure,
+			Message: fmt.Sprintf("Not found: %s", OptionGID),
 		})
 	}
 
@@ -54,10 +66,10 @@ func (cmd *cmdMount) run(c *kingpin.ParseContext) error {
 
 	mount := []string{
 		path.Join(dir, "mount"),
-		"--uid", "33",
-		"--gid", "33",
+		"--uid", options[OptionUID],
+		"--gid", options[OptionGID],
 		"-o", "allow_other",
-		options[provisioner.OptionBucket],
+		options[OptionBucket],
 		cmd.MountDir,
 	}
 
