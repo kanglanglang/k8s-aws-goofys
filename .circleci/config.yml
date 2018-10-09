@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/previousnext/k8s-aws-goofys
+    steps:
+      - checkout
+      - run: go get github.com/golang/lint/golint
+      - run: go get github.com/mitchellh/gox
+      - run: make lint
+      - run: make build
