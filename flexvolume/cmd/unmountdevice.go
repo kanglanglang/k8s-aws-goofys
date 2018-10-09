@@ -14,7 +14,7 @@ func (cmd *cmdUnmountDevice) run(c *kingpin.ParseContext) error {
 	})
 }
 
-// Unmount declares the "unmountdevice" subcommand.
+// UnmountDevice declares the "unmountdevice" subcommand.
 func UnmountDevice(app *kingpin.Application) {
 	c := new(cmdUnmountDevice)
 
